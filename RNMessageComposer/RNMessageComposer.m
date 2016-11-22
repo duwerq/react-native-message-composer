@@ -24,31 +24,6 @@
 
 - (NSDictionary *)constantsToExport
 {
-//
-//  RNMessageComposer.m
-//  RNMessageComposer
-//
-//  Created by Matthew Knight on 06/05/2015.
-//  Copyright (c) 2015 Anarchic Knight. All rights reserved.
-//
-
-#import "RNMessageComposer.h"
-#import "RCTConvert.h"
-#import <MessageUI/MessageUI.h>
-#import <ContactsUI/ContactsUI.h>
-
-@interface RNMessageComposer() <MFMessageComposeViewControllerDelegate>
-
-@end
-
-@implementation RNMessageComposer
-{
-    NSMutableArray *composeViews;
-    NSMutableArray *composeCallbacks;
-}
-
-- (NSDictionary *)constantsToExport
-{
     return @{
              @"Sent": @"sent",
              @"Cancelled": @"cancelled",
@@ -63,6 +38,8 @@
     {
         composeCallbacks = [[NSMutableArray alloc] init];
         composeViews = [[NSMutableArray alloc] init];
+        presentAnimated = YES;
+        dismissAnimated = YES;
     }
     return self;
 }
