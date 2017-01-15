@@ -1,4 +1,4 @@
-//
+e//
 //  RNMessageComposer.m
 //  RNMessageComposer
 //
@@ -126,9 +126,13 @@ RCT_EXPORT_METHOD(composeMessageWithArgs:(NSDictionary *)args callback:(RCTRespo
     {
         
         
+            if (args[@"attachments"][@"photoURL"] == (id)[NSNull null] ) {
+                   
+                    NSLog(@"NO PhotoURL");
 
+            } 
 
-            if(args[@"attachments"] && args[@"attachments"][@"photoURL"])    
+            else
             {
                 NSString *photoURL = [RCTConvert NSString:args[@"attachments"][@"photoURL"]];
                 
@@ -138,9 +142,9 @@ RCT_EXPORT_METHOD(composeMessageWithArgs:(NSDictionary *)args callback:(RCTRespo
                 
                 NSString *imageID = @"kUTTypeJPEG";
 
-                if([args[@"attachments"][@"photoType"] isEqualToString:@"png"]) {
+                if([args[@"attachments"][@"attachments"][@"photoType"] isEqualToString:@"png"]) {
                     imageID = @"kUTTypePNG";
-                } else if([args[@"attachments"][@"photoType"] isEqualToString:@"gif"]) {
+                } else if([args[@"attachments"][@"attachments"][@"photoType"] isEqualToString:@"gif"]) {
                     imageID = @"kUTTypeGIF";
                 }
 
@@ -150,15 +154,19 @@ RCT_EXPORT_METHOD(composeMessageWithArgs:(NSDictionary *)args callback:(RCTRespo
         
         
      
-        
-            if(args[@"attachments"] && args[@"attachments"][@"contactInfo"])
+            if (args[@"attachments"][@"contactInfo"] == (id)[NSNull null] ) {
+                   
+                    NSLog(@"NO CONTACT INFO");
+
+            } 
+            else
             {
             
-                NSLog(@"CONTACT INFO =", args[@"attachments"] && args[@"attachments"][@"contactInfo"]);
+                NSLog(@"CONTACT INFO");
                 CNMutableContact *contact = [CNMutableContact new];
                 
                 if (args[@"attachments"][@"contactInfo"][@"givenName"] == (id)[NSNull null] ) {
-                    
+                    NSLog(@"NO GIVEN NAME");
                 } else {
                     
                     contact.givenName = [RCTConvert NSString:args[@"attachments"][@"contactInfo"][@"givenName"]];
@@ -166,8 +174,8 @@ RCT_EXPORT_METHOD(composeMessageWithArgs:(NSDictionary *)args callback:(RCTRespo
 
                 contact.contactType = CNContactTypePerson;
 
-                if (args[@"attachments"][@"contactInfo"][@"conactInfo"] == (id)[NSNull null] ) {
-                    
+                if (args[@"attachments"][@"contactInfo"][@"familyName"] == (id)[NSNull null] ) {
+                    NSLog(@"NO FAMILY NAME");
                 } else {
                     contact.familyName = [RCTConvert NSString:args[@"attachments"][@"contactInfo"][@"familyName"]];
                 }
@@ -215,7 +223,7 @@ RCT_EXPORT_METHOD(composeMessageWithArgs:(NSDictionary *)args callback:(RCTRespo
                 //email
 
                 if (args[@"attachments"][@"contactInfo"][@"emailAddresses"] == (id)[NSNull null] ) {
-                    
+                    NSLog(@"NO EMAIL");
                 } else {
                    
                     NSLog(@"EMAIL" );
@@ -228,7 +236,27 @@ RCT_EXPORT_METHOD(composeMessageWithArgs:(NSDictionary *)args callback:(RCTRespo
                     contact.emailAddresses = allEmails;
                 }
 
-                if(args[@"attachments"] && args[@"attachments"][@"contactURL"])    
+                if (args[@"attachments"][@"contactInfo"] && args[@"attachments"][@"contactURL"] == (id)[NSNull null] ) {
+                    NSArray *array = [[NSArray alloc] initWithObjects:contact, nil];
+                    NSData *bufferedData = [CNContactVCardSerialization dataWithContacts:array error:nil];
+
+                    NSString *contactName = @"";
+                    
+                    if (args[@"attachments"][@"contactName"] == (id)[NSNull null]) {
+                        contactName = @" .vcf";
+                    } else {
+                        contactName = [RCTConvert NSString:args[@"attachments"][@"contactName"]];
+                    }
+
+                    NSString *vcardID = @"kUTTypeVCard"; 
+            
+            
+            
+                    [mcvc addAttachmentData:bufferedData typeIdentifier:vcardID filename:contactName];
+                } 
+
+                else if(args[@"attachments"] && args[@"attachments"][@"contactURL"])    
+                
                 {
                     NSString *contactURL = [RCTConvert NSString:args[@"attachments"][@"contactURL"]];
                     
@@ -243,30 +271,25 @@ RCT_EXPORT_METHOD(composeMessageWithArgs:(NSDictionary *)args callback:(RCTRespo
                     vcString = [vcString stringByReplacingOccurrencesOfString:@"END:VCARD" withString:[vcardImageString stringByAppendingString:@"END:VCARD"]];
                     bufferedData = [vcString dataUsingEncoding:NSUTF8StringEncoding];
 
-                   
-                    NSString *contactName = [RCTConvert NSString:args[@"attachments"][@"contactName"]];
-            
-
+                    
+                    NSString *contactName = @"";
+                    
+                    if (args[@"attachments"][@"contactName"] == (id)[NSNull null]) {
+                        contactName = @" .vcf";
+                    } else {
+                        contactName = [RCTConvert NSString:args[@"attachments"][@"contactName"]];
+                    }
+ 
                     NSString *vcardID = @"kUTTypeVCard"; 
             
             
             
                     [mcvc addAttachmentData:bufferedData typeIdentifier:vcardID filename:contactName];
-                    NSLog(@"CONTACT", contactName);
+                    NSLog(@"CONTACT & CONTACT URL");
 
                 } else {
+                    NSLog(@"NO CONTACT URL");
                     
-                    NSArray *array = [[NSArray alloc] initWithObjects:contact, nil];
-                    NSData *bufferedData = [CNContactVCardSerialization dataWithContacts:array error:nil];
-
-                    NSString *contactName = [RCTConvert NSString:args[@"attachments"][@"contactName"]];
-            
-
-                    NSString *vcardID = @"kUTTypeVCard"; 
-            
-            
-            
-                    [mcvc addAttachmentData:bufferedData typeIdentifier:vcardID filename:contactName];
 
                 }
 
